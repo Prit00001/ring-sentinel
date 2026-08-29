@@ -1,0 +1,83 @@
+# Ring Sentinel — base configuration
+# Every number a reviewer might want to argue with lives in config/, not in code.
+
+seed: 1337
+
+paths:
+  raw_ieee: data/raw/ieee
+  raw_baf: data/raw/baf
+  interim: data/interim
+  processed: data/processed
+  artifacts: artifacts
+  reports: reports
+  figures: reports/figures
+  ledger: artifacts/ledger.jsonl
+
+split:
+  train_frac: 0.60      # earliest 60% of rows by TransactionDT
+  val_frac: 0.20        # next 20% — calibration and threshold fitting only
+  test_frac: 0.20       # final 20% — touched exactly once, at the end
+  embargo_days: 1       # gap dropped between splits, kills boundary leakage
+
+entities:
+  # Hub pruning. gmail.com touches roughly a third of the dataset; unpruned,
+  # union-find collapses the graph into one component and every ring feature
+  # becomes a constant. Tuned on train only; the value is reported in
+  # reports/entity_coverage.md.
+  max_entity_degree: 200
+  min_entity_degree: 2
+  # A second, coarser safety net: no single component may cover more than
+  # this fraction of the current window's rows. Per-entity degree capping
+  # bounds one entity value's blast radius, but many moderate-degree entities
+  # chained together can still merge most of a window into one component
+  # (see entities/graph.py build_window_graph docstring). Tuned on train only.
+  max_component_frac: 0.5
+  # ...but a FRACTION of the window is not tight enough once windows are
+  # large: at full IEEE-CIS scale a 14-day lookback window holds tens of
+  # thousands of rows, so 50% of it is a "ring" of ~20,000 transactions —
+  # obviously not a ring. The effective cap used is
+  # min(max_component_frac * window_size, max_component_size_abs), so this
+  # absolute number is the one that actually binds at real-data scale. 300
+  # is generous relative to the spec's own worked example (a 34-transaction,
+  # 19-UID case) while still ruling out mega-components.
+  max_component_size_abs: 300
+  # Entity types that participate in edge construction.
+  edge_types: [uid, device, email, addr, card]
+
+graph:
+  lookback_days: 14     # graph window is [d - lookback, d)
+  small_amount_usd: 5.0 # "card testing" amount threshold, used by comp_amt_small_share
+
+features:
+  label_lag_days: 30    # chargebacks arrive late; no label may be used before it matures
+  smoothing_strength: 20.0
+  velocity_windows_sec: [3600, 86400]
+
+model:
+  objective: binary
+  n_estimators: 3000
+  learning_rate: 0.03
+  num_leaves: 96
+  min_child_samples: 100
+  feature_fraction: 0.7
+  bagging_fraction: 0.8
+  bagging_freq: 1
+  lambda_l2: 5.0
+  max_bin: 255
+  early_stopping_rounds: 200
+  # is_unbalance is deliberately False. scale_pos_weight is set to 1.0 because
+  # the downstream policy engine consumes *calibrated probabilities*, and
+  # reweighting the positive class distorts the probability scale that the
+  # rupee cost model depends on. Rebalancing is handled by the decision
+  # threshold, not by the loss. See MODEL_CARD.md.
+  is_unbalance: false
+  scale_pos_weight: 1.0
+
+eval:
+  fpr_points: [0.001, 0.005, 0.01, 0.05]
+  precision_at_k_per_day: 100
+  ece_bins: 15
+  case_score_cap: 50    # noisy-OR cap, stops big components saturating to 1.0
+  psi_top_features: 15
+  psi_flag_threshold: 0.25
+  sensitivity_perturbations: [-0.25, -0.10, 0.10, 0.25]

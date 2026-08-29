@@ -1,0 +1,602 @@
+[
+  {
+    "case_id": "case_2385884",
+    "score": 0.9223,
+    "decision": "block",
+    "expected_cost": 168080.51,
+    "expected_saving": 2494309.98,
+    "n_uid": 2,
+    "n_device": 3,
+    "n_transactions": 323,
+    "amount_total_inr": 2884833.0,
+    "amount_cv": 0.1478,
+    "age_hours": 9.78,
+    "velocity_24h": 323,
+    "day_start": 164,
+    "day_end": 164,
+    "shared_entity": {
+      "type": "device",
+      "value": "windows|windows|edge|24|x",
+      "n_uid": 2
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 3.0,
+      "shap": 1.0
+    },
+    "n_labeled": 323,
+    "n_fraud": 0,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2294887",
+    "score": 0.9997,
+    "decision": "block",
+    "expected_cost": 275.06,
+    "expected_saving": 1091463.35,
+    "n_uid": 15,
+    "n_device": 2,
+    "n_transactions": 25,
+    "amount_total_inr": 1090305.75,
+    "amount_cv": 1.0372,
+    "age_hours": 22.12,
+    "velocity_24h": 25,
+    "day_start": 157,
+    "day_end": 157,
+    "shared_entity": {
+      "type": "device",
+      "value": "sm-gu build/rnw|android|chrome generic for android|24|x",
+      "n_uid": 15
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 25,
+    "n_fraud": 0,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2244177",
+    "score": 1.0,
+    "decision": "block",
+    "expected_cost": 0.0,
+    "expected_saving": 1053258.51,
+    "n_uid": 16,
+    "n_device": 1,
+    "n_transactions": 21,
+    "amount_total_inr": 1051458.51,
+    "amount_cv": 1.4923,
+    "age_hours": 22.79,
+    "velocity_24h": 21,
+    "day_start": 153,
+    "day_end": 153,
+    "shared_entity": {
+      "type": "device",
+      "value": "vspp build/lmyv|android|chrome generic|24|x",
+      "n_uid": 16
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 21,
+    "n_fraud": 1,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2244200",
+    "score": 0.7878,
+    "decision": "review",
+    "expected_cost": 125036.42,
+    "expected_saving": 690238.9,
+    "n_uid": 10,
+    "n_device": 5,
+    "n_transactions": 22,
+    "amount_total_inr": 1033103.25,
+    "amount_cv": 0.7569,
+    "age_hours": 20.42,
+    "velocity_24h": 22,
+    "day_start": 153,
+    "day_end": 153,
+    "shared_entity": {
+      "type": "device",
+      "value": "windows|windows|chrome generic|24|x",
+      "n_uid": 10
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 22,
+    "n_fraud": 0,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2493084",
+    "score": 0.893,
+    "decision": "block",
+    "expected_cost": 67331.18,
+    "expected_saving": 683361.7,
+    "n_uid": 1,
+    "n_device": 1,
+    "n_transactions": 84,
+    "amount_total_inr": 838854.0,
+    "amount_cv": 0.0863,
+    "age_hours": 10.14,
+    "velocity_24h": 84,
+    "day_start": 171,
+    "day_end": 171,
+    "shared_entity": {
+      "type": "device",
+      "value": "windows|windows|NA|24|x",
+      "n_uid": 1
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 84,
+    "n_fraud": 0,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2459844",
+    "score": 0.9981,
+    "decision": "block",
+    "expected_cost": 999.52,
+    "expected_saving": 683104.39,
+    "n_uid": 19,
+    "n_device": 4,
+    "n_transactions": 20,
+    "amount_total_inr": 683640.0,
+    "amount_cv": 2.3579,
+    "age_hours": 23.58,
+    "velocity_24h": 20,
+    "day_start": 169,
+    "day_end": 169,
+    "shared_entity": {
+      "type": "device",
+      "value": "mya-l build/huaweimya-l|NA|chrome for android|NA|NA",
+      "n_uid": 19
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 20,
+    "n_fraud": 2,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2387891",
+    "score": 0.9417,
+    "decision": "block",
+    "expected_cost": 30090.16,
+    "expected_saving": 619599.03,
+    "n_uid": 22,
+    "n_device": 3,
+    "n_transactions": 35,
+    "amount_total_inr": 688110.84,
+    "amount_cv": 1.7824,
+    "age_hours": 23.06,
+    "velocity_24h": 35,
+    "day_start": 164,
+    "day_end": 164,
+    "shared_entity": {
+      "type": "device",
+      "value": "rv:|windows|firefox|24|x",
+      "n_uid": 22
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 35,
+    "n_fraud": 2,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2449303",
+    "score": 0.8143,
+    "decision": "review",
+    "expected_cost": 110232.07,
+    "expected_saving": 610947.6,
+    "n_uid": 17,
+    "n_device": 4,
+    "n_transactions": 25,
+    "amount_total_inr": 883854.75,
+    "amount_cv": 1.7526,
+    "age_hours": 23.28,
+    "velocity_24h": 25,
+    "day_start": 168,
+    "day_end": 168,
+    "shared_entity": {
+      "type": "device",
+      "value": "windows|windows|edge|24|x",
+      "n_uid": 17
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 25,
+    "n_fraud": 0,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2268634",
+    "score": 1.0,
+    "decision": "block",
+    "expected_cost": 0.0,
+    "expected_saving": 608437.08,
+    "n_uid": 19,
+    "n_device": 2,
+    "n_transactions": 22,
+    "amount_total_inr": 606637.08,
+    "amount_cv": 0.7594,
+    "age_hours": 19.59,
+    "velocity_24h": 22,
+    "day_start": 155,
+    "day_end": 155,
+    "shared_entity": {
+      "type": "device",
+      "value": "ios device|ios|mobile safari generic|32|x",
+      "n_uid": 19
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 22,
+    "n_fraud": 6,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2161056",
+    "score": 0.9972,
+    "decision": "block",
+    "expected_cost": 1242.86,
+    "expected_saving": 594852.1,
+    "n_uid": 17,
+    "n_device": 1,
+    "n_transactions": 22,
+    "amount_total_inr": 595956.96,
+    "amount_cv": 1.4588,
+    "age_hours": 22.49,
+    "velocity_24h": 22,
+    "day_start": 146,
+    "day_end": 146,
+    "shared_entity": {
+      "type": "device",
+      "value": "windows|NA|firefox|NA|NA",
+      "n_uid": 17
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 22,
+    "n_fraud": 2,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2233895",
+    "score": 0.9762,
+    "decision": "block",
+    "expected_cost": 10036.44,
+    "expected_saving": 540831.78,
+    "n_uid": 22,
+    "n_device": 3,
+    "n_transactions": 27,
+    "amount_total_inr": 562491.54,
+    "amount_cv": 1.1365,
+    "age_hours": 23.45,
+    "velocity_24h": 27,
+    "day_start": 152,
+    "day_end": 152,
+    "shared_entity": {
+      "type": "device",
+      "value": "windows|windows|chrome|24|x",
+      "n_uid": 22
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 1.0,
+      "shap": 1.0
+    },
+    "n_labeled": 27,
+    "n_fraud": 1,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2362849",
+    "score": 0.9878,
+    "decision": "block",
+    "expected_cost": 4990.11,
+    "expected_saving": 536354.27,
+    "n_uid": 15,
+    "n_device": 3,
+    "n_transactions": 18,
+    "amount_total_inr": 546219.06,
+    "amount_cv": 1.8154,
+    "age_hours": 23.43,
+    "velocity_24h": 18,
+    "day_start": 162,
+    "day_end": 162,
+    "shared_entity": {
+      "type": "device",
+      "value": "ios device|ios|mobile safari|32|x",
+      "n_uid": 15
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 18,
+    "n_fraud": 3,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2269029",
+    "score": 0.6641,
+    "decision": "review",
+    "expected_cost": 98036.52,
+    "expected_saving": 529084.81,
+    "n_uid": 13,
+    "n_device": 0,
+    "n_transactions": 17,
+    "amount_total_inr": 942582.36,
+    "amount_cv": 1.6672,
+    "age_hours": 21.68,
+    "velocity_24h": 17,
+    "day_start": 155,
+    "day_end": 155,
+    "shared_entity": {
+      "type": "addr",
+      "value": "191_87",
+      "n_uid": 13
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 17,
+    "n_fraud": 1,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2610664",
+    "score": 0.9675,
+    "decision": "block",
+    "expected_cost": 13156.54,
+    "expected_saving": 510617.1,
+    "n_uid": 14,
+    "n_device": 2,
+    "n_transactions": 16,
+    "amount_total_inr": 539572.26,
+    "amount_cv": 1.6614,
+    "age_hours": 23.77,
+    "velocity_24h": 16,
+    "day_start": 180,
+    "day_end": 180,
+    "shared_entity": {
+      "type": "device",
+      "value": "NA|android|chrome|24|x",
+      "n_uid": 14
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 16,
+    "n_fraud": 2,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2268529",
+    "score": 0.9922,
+    "decision": "block",
+    "expected_cost": 2983.03,
+    "expected_saving": 504354.56,
+    "n_uid": 15,
+    "n_device": 4,
+    "n_transactions": 20,
+    "amount_total_inr": 509528.55,
+    "amount_cv": 1.433,
+    "age_hours": 22.48,
+    "velocity_24h": 20,
+    "day_start": 155,
+    "day_end": 155,
+    "shared_entity": {
+      "type": "device",
+      "value": "NA|NA|mobile safari generic|NA|NA",
+      "n_uid": 15
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 20,
+    "n_fraud": 3,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2400560",
+    "score": 0.4049,
+    "decision": "review",
+    "expected_cost": 97506.18,
+    "expected_saving": 481566.23,
+    "n_uid": 10,
+    "n_device": 0,
+    "n_transactions": 14,
+    "amount_total_inr": 1428226.8,
+    "amount_cv": 1.1247,
+    "age_hours": 20.59,
+    "velocity_24h": 14,
+    "day_start": 165,
+    "day_end": 165,
+    "shared_entity": {
+      "type": "addr",
+      "value": "170_87",
+      "n_uid": 10
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 14,
+    "n_fraud": 0,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2499817",
+    "score": 0.8262,
+    "decision": "review",
+    "expected_cost": 83895.0,
+    "expected_saving": 465776.94,
+    "n_uid": 14,
+    "n_device": 0,
+    "n_transactions": 27,
+    "amount_total_inr": 663495.93,
+    "amount_cv": 0.908,
+    "age_hours": 23.72,
+    "velocity_24h": 27,
+    "day_start": 172,
+    "day_end": 172,
+    "shared_entity": {
+      "type": "addr",
+      "value": "123_87",
+      "n_uid": 14
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 27,
+    "n_fraud": 0,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2444566",
+    "score": 0.9801,
+    "decision": "block",
+    "expected_cost": 6990.8,
+    "expected_saving": 453248.12,
+    "n_uid": 2,
+    "n_device": 0,
+    "n_transactions": 11,
+    "amount_total_inr": 467794.65,
+    "amount_cv": 0.4617,
+    "age_hours": 18.79,
+    "velocity_24h": 11,
+    "day_start": 168,
+    "day_end": 168,
+    "shared_entity": {
+      "type": "addr",
+      "value": "485_87",
+      "n_uid": 2
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 11,
+    "n_fraud": 10,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2557200",
+    "score": 0.9208,
+    "decision": "block",
+    "expected_cost": 31092.46,
+    "expected_saving": 452713.99,
+    "n_uid": 11,
+    "n_device": 2,
+    "n_transactions": 18,
+    "amount_total_inr": 523600.8,
+    "amount_cv": 1.0859,
+    "age_hours": 22.16,
+    "velocity_24h": 18,
+    "day_start": 176,
+    "day_end": 176,
+    "shared_entity": {
+      "type": "device",
+      "value": "macos|mac os x|chrome|24|x",
+      "n_uid": 11
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 18,
+    "n_fraud": 4,
+    "analyst_decision": null,
+    "decided_at": null
+  },
+  {
+    "case_id": "case_2624017",
+    "score": 0.9041,
+    "decision": "block",
+    "expected_cost": 38775.35,
+    "expected_saving": 450255.44,
+    "n_uid": 19,
+    "n_device": 7,
+    "n_transactions": 26,
+    "amount_total_inr": 539098.11,
+    "amount_cv": 1.9609,
+    "age_hours": 23.34,
+    "velocity_24h": 26,
+    "day_start": 181,
+    "day_end": 181,
+    "shared_entity": {
+      "type": "device",
+      "value": "windows|windows|chrome|24|x",
+      "n_uid": 19
+    },
+    "top_feature": {
+      "feature": "V258",
+      "value": 0.0,
+      "shap": 1.0
+    },
+    "n_labeled": 26,
+    "n_fraud": 3,
+    "analyst_decision": null,
+    "decided_at": null
+  }
+]

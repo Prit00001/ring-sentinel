@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ring Sentinel — Case {{ case.case_id }}</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; margin: 0; background: #f5f6f8; color: #1a1a1a; }
+    header { background: #111827; color: white; padding: 16px 24px; }
+    header a { color: #9ca3af; text-decoration: none; font-size: 13px; }
+    main { max-width: 800px; margin: 24px auto; padding: 0 16px; }
+    section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 16px;
+              box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    h2 { margin-top: 0; font-size: 15px; color: #374151; text-transform: uppercase; letter-spacing: 0.03em; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .stat { background: #f9fafb; border-radius: 6px; padding: 10px; }
+    .stat .label { font-size: 11px; color: #6b7280; text-transform: uppercase; }
+    .stat .value { font-size: 18px; font-weight: 700; }
+    ul.brief-list { padding-left: 18px; }
+    .used-template { font-size: 12px; color: #92400e; background: #fef3c7; padding: 6px 10px;
+                      border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+    .grounding { font-size: 13px; color: #374151; }
+    form.decide { display: flex; gap: 8px; margin-top: 8px; }
+    button { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .btn-block { background: #dc2626; color: white; }
+    .btn-allow { background: #059669; color: white; }
+    .btn-review { background: #2563eb; color: white; }
+    pre { background: #111827; color: #d1d5db; padding: 12px; border-radius: 6px;
+          overflow-x: auto; font-size: 12px; }
+    .decided { font-size: 13px; color: #065f46; background: #d1fae5; padding: 8px 12px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <header><a href="/">&larr; Back to queue</a></header>
+  <main>
+    <section>
+      <h2>Case {{ case.case_id }}</h2>
+      <div class="stat-grid">
+        <div class="stat"><div class="label">Score</div><div class="value">{{ "%.3f"|format(case.score) }}</div></div>
+        <div class="stat"><div class="label">Decision</div><div class="value">{{ case.decision }}</div></div>
+        <div class="stat"><div class="label">Expected saving</div><div class="value">₹{{ "{:,.0f}".format(case.expected_cost) }}</div></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Narrator brief</h2>
+      {% if used_template %}
+      <div class="used-template">Template fallback — no GROQ_API_KEY / cache miss. System still functions correctly.</div>
+      {% endif %}
+      <p>{{ brief.summary }}</p>
+      <strong>Evidence</strong>
+      <ul class="brief-list">{% for e in brief.evidence %}<li>{{ e }}</li>{% endfor %}</ul>
+      <strong>Counter</strong>
+      <ul class="brief-list">{% for c in brief.counter %}<li>{{ c }}</li>{% endfor %}</ul>
+      <strong>Next step</strong>
+      <p>{{ brief.next_step }}</p>
+      <p class="grounding">Numeric fidelity: {{ "%.2f"|format(grounding.numeric_fidelity) }}
+        {% if grounding.unsupported_claim_rate is not none %}
+        &middot; unsupported claim rate: {{ "%.2f"|format(grounding.unsupported_claim_rate) }}
+        {% endif %}
+      </p>
+    </section>
+
+    <section>
+      <h2>Evidence JSON</h2>
+      <pre>{{ evidence_json }}</pre>
+    </section>
+
+    <section>
+      <h2>Analyst decision</h2>
+      {% if case.analyst_decision %}
+      <div class="decided">Recorded: {{ case.analyst_decision }} at {{ case.decided_at }}</div>
+      {% else %}
+      <form class="decide" method="post" action="/cases/{{ case.case_id }}/decide">
+        <button class="btn-block" name="decision" value="block" type="submit">Confirm fraud (block)</button>
+        <button class="btn-allow" name="decision" value="allow" type="submit">Mark legitimate (allow)</button>
+        <button class="btn-review" name="decision" value="escalate" type="submit">Escalate</button>
+      </form>
+      {% endif %}
+    </section>
+  </main>
+</body>
+</html>

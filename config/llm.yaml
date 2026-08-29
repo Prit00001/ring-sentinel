@@ -1,0 +1,55 @@
+# Ring Sentinel — LLM narrator configuration.
+#
+# The LLM never classifies. It narrates evidence the deterministic pipeline has
+# already produced, and its output is measured for grounding.
+#
+# MODEL IDS MUST BE VERIFIED LIVE BEFORE THE FIRST RUN.
+# Groq retires models on a fast cycle. Run:
+#     make check-models
+# which hits GET https://api.groq.com/openai/v1/models, prints what is actually
+# served, warns on anything served as `preview`, and writes the verified list
+# and the date checked to reports/groq_models.md. Copy the IDs from there into
+# this file and into MODEL_CARD.md.
+#
+# Known-retired IDs that appear in nearly every Groq tutorial online:
+#   llama-3.1-8b-instant        shut down 16 Aug 2026
+#   llama-3.3-70b-versatile     shut down 16 Aug 2026
+#   qwen/qwen3-32b              shut down 17 Jul 2026
+#   meta-llama/llama-4-scout-17b-16e-instruct   shut down 17 Jul 2026
+
+provider: groq
+base_url: https://api.groq.com/openai/v1
+
+narrator:
+  model: openai/gpt-oss-120b     # VERIFY with `make check-models` before first run
+  temperature: 0.2
+  reasoning_effort: low          # gpt-oss accepts low | medium | high
+  max_completion_tokens: 900
+
+judge:
+  # MUST differ from the narrator. A model is lenient about its own phrasing,
+  # so narrating and judging with the same ID gives correlated errors and an
+  # inflated grounding score. See section 10.4 of the build spec.
+  model: qwen/qwen3.6-27b        # VERIFY with `make check-models` before first run
+  temperature: 0.0
+  max_completion_tokens: 300
+
+cache_dir: artifacts/narratives
+max_retries: 5
+retry_base_delay_sec: 1.0
+request_timeout_sec: 60
+
+# Published price per 1M tokens, used only to convert the token meter into
+# rupees in reports/llm_cost.md. Record the date you read these off the
+# pricing page — they are quoted, not measured.
+pricing:
+  checked_on: null               # set by `make check-models`
+  narrator_usd_per_1m_input: null
+  narrator_usd_per_1m_output: null
+  judge_usd_per_1m_input: null
+  judge_usd_per_1m_output: null
+
+# When true, a cache miss with no GROQ_API_KEY falls back to the deterministic
+# template narrator instead of raising. This is what makes `make repro` work
+# from a clean checkout with no key.
+allow_template_fallback: true

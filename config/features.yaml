@@ -1,0 +1,80 @@
+# Ring Sentinel — feature configuration.
+# Feature groups map 1:1 onto the ablation rows in reports/ablation.md.
+
+groups:
+  # Row B in the ablation: raw tabular features only, no aggregates, no graph.
+  base:
+    - amount
+    - amount_log
+    - amount_cents          # amt - floor(amt); near-identical cents is a card-testing tell
+    - hour
+    - day_of_week
+    - ProductCD
+    - card_block            # card1..card6
+    - addr_block            # addr1, addr2
+    - email_freq            # frequency-encoded P_/R_emaildomain, fitted on train only
+    - C_block               # C1..C14
+    - D_block               # D1..D15
+    - M_block               # M1..M9
+    - V_block_pruned        # correlation-pruned V1..V339
+    - identity_missing      # missingness indicators for the identity join
+
+  # Row C: entity-level expanding aggregates. Strictly prior rows only. No graph.
+  causal_agg:
+    - uid_prior_count
+    - uid_prior_amt_mean
+    - uid_prior_amt_cv
+    - uid_velocity_1h
+    - uid_velocity_24h
+    - uid_age_hours
+    - uid_prior_fraud_rate
+    - uid_prior_n_labeled
+    - card_prior_count
+    - addr_prior_count
+    - device_prior_count
+
+  # Row D: the differentiator. Component-level features over the ring graph.
+  ring:
+    - comp_size
+    - comp_n_uid
+    - comp_n_device
+    - comp_uid_per_device
+    - comp_velocity_1h
+    - comp_velocity_24h
+    - comp_age_hours
+    - comp_amt_mean
+    - comp_amt_cv
+    - comp_amt_small_share
+    - comp_new_entity_ratio
+    - comp_prior_fraud_rate
+    - comp_prior_n_labeled
+    - comp_burstiness
+    - comp_hour_entropy
+    - comp_addr_per_card
+    - uid_degree
+    - device_degree
+    - addr_degree
+
+v_pruning:
+  # Drop one of any V-pair with |r| > threshold, keeping the higher-coverage
+  # member. Correlation is computed on the TRAIN SPLIT ONLY.
+  corr_threshold: 0.95
+  sample_rows: 100000       # correlation is estimated on a sample for tractability
+
+categorical:
+  # Columns handed to LightGBM as native categoricals rather than one-hot.
+  - ProductCD
+  - card4
+  - card6
+  - P_emaildomain
+  - R_emaildomain
+  - DeviceType
+  - M1
+  - M2
+  - M3
+  - M4
+  - M5
+  - M6
+  - M7
+  - M8
+  - M9

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ring Sentinel — Review Queue</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; margin: 0; background: #f5f6f8; color: #1a1a1a; }
+    header { background: #111827; color: white; padding: 16px 24px; }
+    header h1 { margin: 0; font-size: 20px; }
+    header p { margin: 4px 0 0; color: #9ca3af; font-size: 13px; }
+    main { max-width: 960px; margin: 24px auto; padding: 0 16px; }
+    .banner { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px;
+               padding: 10px 14px; margin-bottom: 16px; font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px;
+            overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+    th { background: #f9fafb; color: #6b7280; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+    tr:last-child td { border-bottom: none; }
+    a.case-link { color: #1d4ed8; text-decoration: none; font-weight: 600; }
+    a.case-link:hover { text-decoration: underline; }
+    .empty { padding: 40px; text-align: center; color: #6b7280; }
+    .decision { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .decision.review { background: #fef3c7; color: #92400e; }
+    .decision.block { background: #fee2e2; color: #991b1b; }
+    .decision.allow { background: #d1fae5; color: #065f46; }
+    footer { text-align: center; color: #9ca3af; font-size: 12px; margin: 24px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ring Sentinel — Analyst Console</h1>
+    <p>Review queue, ordered by expected cost saving</p>
+  </header>
+  <main>
+    {% if demo_mode %}
+    <div class="banner">
+      Demo data — these cases are illustrative, not computed from a trained
+      model or real IEEE-CIS data. No number here is used in any reported
+      metric. Run <code>make repro</code> to score the real held-out test
+      split and populate this queue with real cases.
+    </div>
+    {% else %}
+    <div class="banner" style="background:#d1fae5;border-color:#059669;">
+      Real cases — scored by the trained LightGBM + calibration pipeline on
+      the held-out IEEE-CIS test split, rolled up via noisy-OR case
+      aggregation. From <code>artifacts/case_queue.json</code> (regenerate
+      with <code>make eval</code>).
+    </div>
+    {% endif %}
+    {% if cases %}
+    <table>
+      <thead>
+        <tr><th>Case</th><th>Score</th><th>Decision</th><th>Expected saving (₹)</th><th>Component</th></tr>
+      </thead>
+      <tbody>
+        {% for c in cases %}
+        <tr>
+          <td><a class="case-link" href="/cases/{{ c.case_id }}">{{ c.case_id }}</a></td>
+          <td>{{ "%.3f"|format(c.score) }}</td>
+          <td><span class="decision {{ c.decision }}">{{ c.decision }}</span></td>
+          <td>₹{{ "{:,.0f}".format(c.expected_saving if c.expected_saving is defined else c.expected_cost) }}</td>
+          <td>{{ c.n_uid }} UIDs · {{ c.n_device }} devices · {{ c.n_transactions }} txns</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No cases in the queue.</div>
+    {% endif %}
+  </main>
+  <footer>Defense-only. All decisions are analyst-made; the policy engine recommends, the model scores, the LLM narrates.</footer>
+</body>
+</html>

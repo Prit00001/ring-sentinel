@@ -1,0 +1,52 @@
+# Ring Sentinel — cost model.
+#
+# Every rupee assumption in the entire project lives in this file. Nothing in
+# src/ hardcodes a currency amount. These numbers are arguable by design:
+# published so they *can* be argued with. reports/sensitivity_costs.md shows
+# how the optimal thresholds move when the contested ones change.
+
+currency: INR
+usd_inr: 87.0                    # A MODELING CONVENTION, NOT A MARKET RATE.
+                                 # IEEE-CIS amounts are USD. Fixing the rate
+                                 # keeps the cost report reproducible; it is
+                                 # not a claim about any date's FX.
+
+fraud_allowed:                   # cost of a false negative
+  goods_loss_pct: 1.00           # full transaction value is lost
+  chargeback_fee: 1500           # representative flat dispute fee
+  ops_handling: 300              # analyst time per dispute
+  scheme_penalty_risk: 0.0       # DELIBERATELY ZERO. Card schemes run acquirer
+                                 # monitoring programmes with fraud-to-sales and
+                                 # dispute-ratio thresholds, and breaching them
+                                 # triggers remediation and fees. Programme names
+                                 # and thresholds change (Visa consolidated its
+                                 # fraud and dispute programmes into a single
+                                 # acquirer monitoring programme in 2025;
+                                 # Mastercard runs its own excessive-fraud and
+                                 # excessive-chargeback programmes). We have not
+                                 # verified current figures against the schemes'
+                                 # own published documents, so we quote none and
+                                 # leave this at zero. Quoting a stale threshold
+                                 # to a payments panel is worse than omitting it.
+
+legit_blocked:                   # cost of a false positive
+  gross_margin_pct: 0.25         # margin forgone on the declined sale
+  ltv_multiplier: 3.0            # repeat-purchase value lost after a false decline
+  support_contact_rate: 0.30     # share of falsely-declined customers who contact support
+  support_cost: 150
+
+review:
+  analyst_cost_per_case: 40
+  delay_conversion_loss_pct: 0.05  # share of margin lost to review friction
+  daily_capacity: 100              # cases a small ops team can actually work
+  review_accuracy: 0.85            # P(analyst catches the fraud | case is fraud).
+                                   # Review is not free of leakage: the residual
+                                   # (1 - review_accuracy) share is allowed through
+                                   # and costs the full fraud_allowed amount.
+
+# Which parameters the sensitivity table sweeps, and over what range.
+sensitivity_sweeps:
+  ltv_multiplier: [1.0, 2.0, 3.0, 4.0, 5.0]
+  chargeback_fee: [500, 1000, 1500, 2500, 4000]
+  review_accuracy: [0.6, 0.7, 0.85, 0.95, 1.0]
+  analyst_cost_per_case: [20, 40, 80, 160]

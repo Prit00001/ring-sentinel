@@ -6,7 +6,34 @@ writes must trace back to a field here — that is what grounding.py checks.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
+
+# Numbers only — never a digit that's part of a larger identifier token like
+# "c_00417" or "24h" (velocity_24h). Lookarounds exclude any adjacent letter,
+# digit, or underscore so those don't get misread as numbers. Shared between
+# flatten_numeric_values (below) and grounding.py's numeric-fidelity check so
+# the two always agree on what counts as "a number" — a string-valued evidence
+# field like a device fingerprint ("windows|windows|edge|24|x") is delimited
+# by "|", not by letters/digits/underscores, so a number embedded in it (the
+# id_32 colour-depth "24") matches here too and is correctly treated as
+# grounded when the narrator quotes that field verbatim.
+NUMBER_RE = re.compile(r"(?<![A-Za-z0-9_.])-?\d[\d,]*\.?\d*(?![A-Za-z0-9_])")
+
+
+def extract_numbers(text: str) -> list[str]:
+    """Every numeric token in text, normalised the same way as evidence values."""
+    out = []
+    for m in NUMBER_RE.finditer(text):
+        tok = m.group().replace(",", "")
+        if tok in ("", "-", "."):
+            continue
+        try:
+            f = float(tok)
+        except ValueError:
+            continue
+        out.append(_normalise_number(f))
+    return out
 
 
 @dataclass
@@ -99,6 +126,13 @@ def flatten_numeric_values(evidence: dict) -> set[str]:
             return
         if isinstance(v, (int, float)):
             out.add(_normalise_number(v))
+        elif isinstance(v, str):
+            # A string-valued field (e.g. a device fingerprint like
+            # "windows|windows|edge|24|x") can embed a real number. If the
+            # narrator quotes that field verbatim, its embedded number must
+            # count as grounded — otherwise numeric fidelity is docked for
+            # correctly citing evidence, not for hallucinating.
+            out.update(extract_numbers(v))
         elif isinstance(v, dict):
             for vv in v.values():
                 walk(vv)

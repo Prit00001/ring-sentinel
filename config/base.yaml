@@ -45,7 +45,14 @@ entities:
   edge_types: [uid, device, email, addr, card]
 
 graph:
-  lookback_days: 14     # graph window is [d - lookback, d)
+  # Graph window is [d - lookback, d). Must exceed features.label_lag_days
+  # (30): comp_prior_fraud_rate/comp_prior_n_labeled only count a label as
+  # matured `label_lag_days` before "now", so if the window itself never
+  # reaches back that far, no label inside it can ever have matured -- the
+  # feature is a structural constant (verified: was a single value across
+  # the whole test set at lookback_days=14). 45 gives matured labels ~15
+  # days of headroom inside the window.
+  lookback_days: 45
   small_amount_usd: 5.0 # "card testing" amount threshold, used by comp_amt_small_share
 
 features:

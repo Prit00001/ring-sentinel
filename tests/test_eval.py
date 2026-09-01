@@ -79,6 +79,21 @@ def test_precision_at_k_basic():
     assert precision_at_k(y, score, 2) == pytest.approx(1.0)
 
 
+def test_precision_at_k_per_day_is_not_the_same_as_over_the_whole_period():
+    """k=2 per day, across 2 days: day 0's top-2 (indices 0,1) are both
+    positive; day 1's top-2 by score (indices 4,5) are both negative --
+    the actual fraud in day 1 (index 3) scores lower and is missed. Pooled
+    precision is 2/4 = 0.5, not the 1.0 you'd get by mistakenly taking one
+    top-(k=2) over all 6 rows (which only ever looks at day 0)."""
+    day = np.array([0, 0, 0, 1, 1, 1])
+    y = np.array([1, 1, 0, 1, 0, 0])
+    score = np.array([0.9, 0.8, 0.1, 0.5, 0.7, 0.6])
+    assert precision_at_k(y, score, 2, day=day) == pytest.approx(0.5)
+    # Sanity: without `day`, k=2 over the whole array only sees day 0's
+    # top-2 (both positive) and misses day 1 entirely — the bug being fixed.
+    assert precision_at_k(y, score, 2) == pytest.approx(1.0)
+
+
 def test_case_level_precision_matches_spec_definition():
     """A flagged case is a TP if it contains at least one confirmed fraud
     transaction — not "every member is fraud" (build spec section 8)."""

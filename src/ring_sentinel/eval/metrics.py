@@ -54,15 +54,37 @@ def recall_at_fpr(y: np.ndarray, score: np.ndarray, target_fpr: float) -> float:
     return tp / len(pos_scores)
 
 
-def precision_at_k(y: np.ndarray, score: np.ndarray, k: int) -> float:
-    """Precision among the top-k highest-scored rows."""
+def precision_at_k(y: np.ndarray, score: np.ndarray, k: int, day: np.ndarray | None = None) -> float:
+    """Precision among the top-k highest-scored rows.
+
+    Without `day`, k is taken once over the whole array passed in — correct
+    when the caller already sliced to a single day. With `day`, an analyst
+    reviewing k cases *per day* is modeled properly: top-k is taken
+    independently within each day and precision is pooled (total TP / total
+    flagged) across days, rather than taking one top-k over the entire test
+    period — which silently turns "k=100/day" into "k=100 total" and
+    inflates precision.
+    """
     y = np.asarray(y)
     score = np.asarray(score)
     if k <= 0 or len(y) == 0:
         return float("nan")
-    k = min(k, len(y))
-    top_idx = np.argsort(-score, kind="mergesort")[:k]
-    return float(y[top_idx].mean())
+
+    if day is None:
+        k = min(k, len(y))
+        top_idx = np.argsort(-score, kind="mergesort")[:k]
+        return float(y[top_idx].mean())
+
+    day = np.asarray(day)
+    tp = flagged = 0
+    for d in np.unique(day):
+        mask = day == d
+        yd, sd = y[mask], score[mask]
+        kd = min(k, len(yd))
+        idx = np.argsort(-sd, kind="mergesort")[:kd]
+        tp += int(yd[idx].sum())
+        flagged += kd
+    return tp / flagged if flagged else float("nan")
 
 
 def case_level_precision(case_flagged: np.ndarray, case_has_confirmed_fraud: np.ndarray) -> float:
@@ -82,6 +104,7 @@ def headline_metrics(
     fpr_points: list[float],
     precision_at_k_per_day: int,
     ece_bins: int = 15,
+    day: np.ndarray | None = None,
 ) -> dict:
     """One row of the headline table (build spec section 12)."""
     y = np.asarray(y)
@@ -98,7 +121,7 @@ def headline_metrics(
         "roc_auc_caveat": roc_caveat,
         "brier": brier_score(y, score),
         "ece": ece,
-        "precision_at_k": precision_at_k(y, score, precision_at_k_per_day),
+        "precision_at_k": precision_at_k(y, score, precision_at_k_per_day, day=day),
     }
     for fp in fpr_points:
         row[f"recall_at_fpr_{fp}"] = recall_at_fpr(y, score, fp)

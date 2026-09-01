@@ -14,6 +14,13 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from dotenv import load_dotenv
+
+# Loaded once, on first import of this module (every entry point — serve,
+# pipeline, Makefile scripts — imports config before touching GROQ_API_KEY).
+# Walks up from the current working directory to find .env; a real
+# environment variable already set always wins (override=False).
+load_dotenv()
 
 
 def repo_root() -> Path:

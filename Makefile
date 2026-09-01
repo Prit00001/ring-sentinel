@@ -1,5 +1,13 @@
 .PHONY: help data repro test smoke serve verify-ledger clean check-models features train eval
 
+# Load .env (GROQ_API_KEY) into every target's shell environment, including
+# check-models below which is plain bash and never imports config.py's
+# load_dotenv(). A real exported env var still takes precedence.
+ifneq (,$(wildcard .env))
+include .env
+export
+endif
+
 help:
 	@echo "Ring Sentinel — Razorpay AI Buildathon Track 2"
 	@echo ""
@@ -126,8 +134,9 @@ result = pickle.load(open('artifacts/train_result.pickle', 'rb')); \
 out = pipeline.run_eval(bundle, result, out_dir='reports'); \
 print('Wrote reports/results.md, reports/slices.md, reports/drift.md'); \
 print(out['note']); \
-cases = pipeline.build_case_queue(bundle, result, top_n=20, out_path='artifacts/case_queue.json'); \
-print(f'Wrote {len(cases)} real cases → artifacts/case_queue.json (make serve picks these up automatically)')"
+cases = pipeline.build_case_queue(bundle, result, top_n=20, out_path='artifacts/case_queue.json', report_dir='reports'); \
+print(f'Wrote {len(cases)} real cases → artifacts/case_queue.json (make serve picks these up automatically)'); \
+print('Wrote reports/economics.md')"
 	@echo "✓ Eval complete → reports/results.md"
 
 # ============================================================================
@@ -159,14 +168,17 @@ print(f'Ledger {p}: {\"VALID\" if ok else \"BROKEN — hash chain does not verif
 raise SystemExit(0 if ok else 1)"
 
 check-models:
-	$(PYTHON) -c "import requests; \
-		r = requests.get('https://api.groq.com/openai/v1/models', \
-			headers={'Authorization': f'Bearer $${GROQ_API_KEY:?Set GROQ_API_KEY}'}); \
-		from datetime import datetime; \
-		print(f'Groq models live {datetime.now().isoformat()}:\n'); \
-		for m in r.json()['data']: \
-			print(f'  {m[\"id\"]}'); \
-		print('\nUpdate config/llm.yaml narrator/judge model IDs')"
+	@: $${GROQ_API_KEY:?Set GROQ_API_KEY}
+	$(PYTHON) -c "\
+import os, requests; \
+from datetime import datetime; \
+r = requests.get('https://api.groq.com/openai/v1/models', headers={'Authorization': f'Bearer {os.environ[\"GROQ_API_KEY\"]}'}); \
+r.raise_for_status(); \
+print(f'Groq models live {datetime.now().isoformat()}:'); \
+print(); \
+print('\n'.join(f'  {m[\"id\"]}' for m in r.json()['data'])); \
+print(); \
+print('Update config/llm.yaml narrator/judge model IDs')"
 
 # ============================================================================
 # CLEANUP

@@ -12,15 +12,8 @@ Two layers:
 from __future__ import annotations
 
 import json
-import re
 
-from .evidence import flatten_numeric_values
-
-# Numbers only — never a digit that's part of a larger identifier token like
-# "c_00417", "device_a91f", or "24h" (velocity_24h). Lookarounds exclude any
-# adjacent letter, digit, or underscore so those don't get misread as
-# hallucinated figures.
-_NUMBER_RE = re.compile(r"(?<![A-Za-z0-9_.])-?\d[\d,]*\.?\d*(?![A-Za-z0-9_])")
+from .evidence import extract_numbers, flatten_numeric_values
 
 JUDGE_SYSTEM_PROMPT = """You are checking one bullet point from a fraud case brief \
 against the evidence JSON it was written from.
@@ -29,20 +22,6 @@ Question: does this claim follow from the evidence JSON alone, with no \
 outside knowledge or inference beyond what the fields directly state?
 
 Answer with exactly one word: yes, no, or partial."""
-
-
-def _extract_numbers(text: str) -> list[str]:
-    out = []
-    for m in _NUMBER_RE.finditer(text):
-        tok = m.group().replace(",", "")
-        if tok in ("", "-", "."):
-            continue
-        try:
-            f = float(tok)
-        except ValueError:
-            continue
-        out.append(str(int(f)) if f == int(f) else f"{f:g}")
-    return out
 
 
 def numeric_fidelity(brief: dict, evidence: dict) -> dict:
@@ -59,13 +38,13 @@ def numeric_fidelity(brief: dict, evidence: dict) -> dict:
         text = brief.get(section)
         if isinstance(text, list):
             text = " ".join(text)
-        for num in _extract_numbers(text or ""):
+        for num in extract_numbers(text or ""):
             total += 1
             if num not in allowed:
                 unsupported.append((section, num))
 
     for bullet in brief.get("evidence", []) or []:
-        for num in _extract_numbers(bullet):
+        for num in extract_numbers(bullet):
             total += 1
             if num not in allowed:
                 unsupported.append(("evidence", num))

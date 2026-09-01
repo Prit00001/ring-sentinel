@@ -25,7 +25,7 @@ from .config import load_config
 from .data.split import Splits, temporal_split
 from .entities.resolve import add_entities
 from .eval.drift import psi_report, top_n_by_importance
-from .eval.metrics import headline_metrics
+from .eval.metrics import case_level_precision, headline_metrics
 from .eval.report import write_ablation_md, write_drift_md, write_results_md, write_slices_md
 from .eval.slices import build_slices
 from .features.base import build_base_features
@@ -152,6 +152,7 @@ def run_eval(bundle: FeatureBundle, train_result: TrainResult, cfg=None, out_dir
     ecfg = cfg.base["eval"]
     y = bundle.df["isFraud"].to_numpy()
     test = bundle.splits.test
+    day = bundle.df["day"].to_numpy()[test]
 
     X_base = bundle.base_feat
     X_full = pd.concat([bundle.base_feat, bundle.ring_feat.drop(columns=["comp_id"], errors="ignore")], axis=1)
@@ -159,21 +160,21 @@ def run_eval(bundle: FeatureBundle, train_result: TrainResult, cfg=None, out_dir
     rows = {}
     rows["A_rules_only"] = headline_metrics(
         y[test], train_result.rules["rules_score"].to_numpy()[test],
-        ecfg["fpr_points"], ecfg["precision_at_k_per_day"], ecfg["ece_bins"],
+        ecfg["fpr_points"], ecfg["precision_at_k_per_day"], ecfg["ece_bins"], day=day,
     )
     rows["B_lgbm_base"] = headline_metrics(
         y[test], train_result.scorer_base.predict(X_base.iloc[test]),
-        ecfg["fpr_points"], ecfg["precision_at_k_per_day"], ecfg["ece_bins"],
+        ecfg["fpr_points"], ecfg["precision_at_k_per_day"], ecfg["ece_bins"], day=day,
     )
     raw_full_scores = train_result.scorer_full.predict(X_full.iloc[test])
     rows["D_plus_ring_features"] = headline_metrics(
         y[test], raw_full_scores,
-        ecfg["fpr_points"], ecfg["precision_at_k_per_day"], ecfg["ece_bins"],
+        ecfg["fpr_points"], ecfg["precision_at_k_per_day"], ecfg["ece_bins"], day=day,
     )
     calibrated_scores = train_result.calibrator.transform(raw_full_scores)
     rows["F_plus_calibration"] = headline_metrics(
         y[test], calibrated_scores,
-        ecfg["fpr_points"], ecfg["precision_at_k_per_day"], ecfg["ece_bins"],
+        ecfg["fpr_points"], ecfg["precision_at_k_per_day"], ecfg["ece_bins"], day=day,
     )
 
     cal_report = calibration_report(y[test], calibrated_scores, ecfg["ece_bins"])
@@ -212,6 +213,7 @@ def build_case_queue(
     cfg=None,
     top_n: int = 20,
     out_path: Path | None = None,
+    report_dir: Path | None = None,
 ) -> list[dict]:
     """Real cases for the analyst console, scored on the held-out test split.
 
@@ -224,6 +226,13 @@ def build_case_queue(
 
     Returns a list of dicts matching serve/api.py's case schema exactly, so
     the console can load real cases the same way it loads the demo ones.
+
+    If `report_dir` is given, also writes reports/economics.md: case-level
+    precision (spec section 8's definition) and total expected cost/saving
+    under the policy, aggregated over EVERY ring in the test period — not
+    just the top `top_n` shown to an analyst. Without this, the only
+    economics anyone sees are the top-20 queue, which is already the
+    easiest, highest-confidence slice and overstates precision.
     """
     cfg = cfg or load_config()
     costs_cfg = cfg.costs
@@ -306,6 +315,26 @@ def build_case_queue(
             "analyst_decision": None,
             "decided_at": None,
         })
+
+    if report_dir is not None and cases:
+        flagged = np.array([c["decision"] in ("block", "review") for c in cases])
+        has_fraud = np.array([c["n_fraud"] > 0 for c in cases])
+        precision = case_level_precision(flagged, has_fraud)
+        total_cost = sum(c["expected_cost"] for c in cases)
+        total_saving = sum(c["expected_saving"] for c in cases)
+        Path(report_dir).mkdir(parents=True, exist_ok=True)
+        text = (
+            "# Ring Sentinel — Case economics (full test period)\n\n"
+            "Every ring in the test split with >=2 transactions, not just the "
+            "top-N shown to an analyst. `case_level_precision` = fraction of "
+            "block/review decisions containing >=1 confirmed-fraud "
+            "transaction (build spec section 8's definition).\n\n"
+            "| n_cases | n_flagged | case_level_precision | total_expected_cost_inr | total_expected_saving_inr |\n"
+            "|---|---|---|---|---|\n"
+            f"| {len(cases)} | {int(flagged.sum())} | {precision:.4f} "
+            f"| {total_cost:,.2f} | {total_saving:,.2f} |\n"
+        )
+        (Path(report_dir) / "economics.md").write_text(text)
 
     # Sort by expected saving, not raw score: the noisy-OR score saturates to
     # (numerically near-)1.0 for any reasonably large, reasonably confident

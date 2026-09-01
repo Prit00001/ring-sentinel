@@ -4,8 +4,9 @@
 WHAT THIS IS
   A small random table that carries the IEEE-CIS *column schema* so the
   pipeline's plumbing can be exercised by pytest and by `make smoke` on a
-  machine that has no Kaggle credentials. Roughly 6,000 rows over ~40 synthetic
-  days.
+  machine that has no Kaggle credentials. Roughly 13,500 rows over ~90
+  synthetic days (density kept at ~150 rows/day; day span kept comfortably
+  past graph.lookback_days so leakage tests exercise real windows).
 
 WHAT THIS IS NOT
   It is not a fraud simulator and it is not a traffic generator. It contains no
@@ -28,8 +29,9 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-N_ROWS = 6000
-N_DAYS = 40
+N_ROWS = 13500
+N_DAYS = 90  # must clear graph.lookback_days (45) with margin so
+             # test_graph_edges_are_backward_only has windows to check
 
 
 def make_fixture(n_rows: int = N_ROWS, n_days: int = N_DAYS, seed: int = 7) -> pd.DataFrame:

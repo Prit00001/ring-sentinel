@@ -323,6 +323,10 @@ def build_case_queue(
         total_cost = sum(c["expected_cost"] for c in cases)
         total_saving = sum(c["expected_saving"] for c in cases)
         Path(report_dir).mkdir(parents=True, exist_ok=True)
+        # ponytail: total_saving is the model's own expected-value estimate
+        # under its predicted probabilities, not verified against ground-truth
+        # isFraud outcomes. Upgrade to a realized-cost pass (decisions scored
+        # against actual outcomes) before quoting this rupee figure externally.
         text = (
             "# Ring Sentinel — Case economics (full test period)\n\n"
             "Every ring in the test split with >=2 transactions, not just the "

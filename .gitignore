@@ -1,80 +1,38 @@
-# Data (large, non-redistributable)
-data/raw/
-data/interim/
-data/processed/
-data/*.zip
-# data/CHECKSUMS.txt is deliberately NOT ignored: build spec 2.9 requires it
-# committed so a reviewer can verify byte-identical raw inputs.
-
-# Artifacts
-# artifacts/narratives/*.json is deliberately NOT ignored: the build spec
-# requires the Groq narrator cache to be committed so `make repro` can
-# regenerate every narrator/grounding number with no GROQ_API_KEY set.
-# artifacts/case_queue.json is deliberately NOT ignored for the same reason
-# — it's what lets `make serve` show real cases from a fresh checkout
-# without re-running the full feature/train pipeline.
-artifacts/*.jsonl
-artifacts/*.pickle
-
-# Reports
-# reports/*.md and reports/figures/ are deliberately NOT ignored: build spec
-# section 4 marks reports/ "generated, committed" — the whole point is that a
-# reviewer can see the results without running `make repro` themselves.
-# reports/_smoke/ IS ignored: it's synthetic-fixture output, never a reported
-# metric (see tests/fixtures/make_fixture.py's own banner).
-reports/_smoke/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
+# Virtual environment
 .venv/
 venv/
-env/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 
-# IDEs
+# Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Data (too large)
+data/raw/*
+data/interim/*
+data/processed/*
+
+# Generated files
+*.pkl
+*.joblib
+*.parquet
+artifacts/ledger.jsonl
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-.DS_Store
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Notebooks (exploration only, not a dependency)
-notebooks/.ipynb_checkpoints
-notebooks/*.ipynb
-
-# Logs
-*.log
 
 # OS
-Thumbs.db
-.Spotlight-V100
-.Trashes
+.DS_Store
+.env
 
-# Stale local archives / caches — not source
+# Jupyter
+.ipynb_checkpoints/
+
+# Large files
 *.zip
-.pytest_cache/

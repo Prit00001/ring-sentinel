@@ -1,8 +1,8 @@
 """Policy engine tests."""
 
 def test_expected_costs():
-    from src.ring_sentinel.policy.engine import expected_costs
-    from src.ring_sentinel.config import load_config
+    from ring_sentinel.policy.engine import expected_costs
+    from ring_sentinel.config import load_config
     
     cfg = load_config()
     costs = cfg.costs

@@ -111,20 +111,47 @@ Output: A ranked queue of cases for analyst review, with brief explanations.
 
 ---
 
+markdown
 ## Performance
 
-> **Results section is empty until `make repro` completes.**
+Run on real IEEE-CIS data (590,540 rows), held-out final 20% by time, touched once.
+Full reproduction: `make repro`. No number below comes from the synthetic test fixture.
 
-Placeholder for:
-- PR-AUC, recall @ fixed FPRs, precision @ k
-- Calibration (Brier score, ECE) before and after isotonic regression
-- Case-level metrics (distinct from transaction-level)
-- Expected rupee cost under the chosen policy
-- Ablation table (one row per feature layer)
-- Slices: recall by amount band, hour of day, device coverage, new vs returning account
-- Drift: PSI on top 15 features between train and test windows
+| Metric | A: rules_only | B: lgbm_base | D: +ring_features | F: +calibration |
+|---|---|---|---|---|
+| PR-AUC | 0.0331 | 0.5122 | 0.5712 | 0.5581 |
+| Recall @ 0.1% FPR | 0.1214 | 0.2316 | 0.2728 | 0.3176 |
+| Recall @ 0.5% FPR | 0.1214 | 0.3657 | 0.4332 | 0.4439 |
+| Recall @ 1.0% FPR | 0.1214 | 0.4161 | 0.4859 | 0.5050 |
+| Recall @ 5.0% FPR | 0.1214 | 0.6228 | 0.6770 | 0.7043 |
+| Precision @ k=100/day | 0.0215 | 0.4666 | 0.5122 | 0.5124 |
+| Brier score | 0.0428 | 0.0225 | 0.0206 | 0.0207 |
+| ECE | 0.0679 | 0.0081 | 0.0048 | 0.0035 |
+| ROC-AUC* | 0.4779 | 0.8999 | 0.9166 | 0.9162 |
 
----
+*ROC-AUC is reference only — at a 3.4% base rate it's dominated by the large
+true-negative population and looks high even for a mediocre detector.
+PR-AUC and recall@FPR are the metrics that actually distinguish these models.
+
+Ring features (D) beat base LightGBM (B) on every metric: PR-AUC +11.5%,
+recall@1%FPR +17%, recall@0.5%FPR +18%. See "What Didn't Work" in README.md
+for how an earlier run had this signal silently dead, and how it was fixed.
+
+### Case-level economics (full test period)
+
+| n_cases | n_flagged (block+review) | case_level_precision | total expected cost, ₹ | total expected saving, ₹ |
+|---|---|---|---|---|
+| 11,505 | 6,314 (54.9%) | 0.1077 | 12,604,376 | 56,860,298 |
+
+This is the number that gates production-readiness, and it fails the bar
+as configured: only ~10.8% of flagged rings contain even one confirmed-fraud
+transaction. The "expected saving" figure is the model's own expected-value
+estimate under its predicted probabilities — not yet verified against
+realized isFraud outcomes (see Next Steps in README.md). The fix is a
+threshold retune against case-level precision, not a model change; see
+README.md § Case economics for detail.
+
+--
 
 ## Training Procedure
 
